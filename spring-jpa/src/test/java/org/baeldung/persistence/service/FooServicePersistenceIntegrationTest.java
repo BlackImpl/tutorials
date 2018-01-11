@@ -2,11 +2,13 @@ package org.baeldung.persistence.service;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
+import org.baeldung.config.PersistenceJPAConfig;
 import org.baeldung.persistence.model.Foo;
-import org.baeldung.spring.PersistenceJPAConfig;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,7 +36,7 @@ public class FooServicePersistenceIntegrationTest {
 
     @Test(expected = DataIntegrityViolationException.class)
     public final void whenInvalidEntityIsCreated_thenDataException() {
-        service.create(new Foo());
+        service.create(new Foo(randomAlphabetic(2048)));
     }
 
     @Test(expected = DataIntegrityViolationException.class)
@@ -49,9 +51,17 @@ public class FooServicePersistenceIntegrationTest {
         service.create(entity);
     }
 
-    @Test
+    @Test(expected = DataAccessException.class)
     public final void temp_whenInvalidEntityIsCreated_thenDataException() {
-        service.create(new Foo());
+        service.create(new Foo(randomAlphabetic(2048)));
+    }
+
+    @Test
+    public final void whenEntityIsCreated_thenFound() {
+        final Foo fooEntity = new Foo("abc");
+        service.create(fooEntity);
+        final Foo found = service.findOne(fooEntity.getId());
+        Assert.assertNotNull(found);
     }
 
 }

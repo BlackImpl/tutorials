@@ -1,8 +1,11 @@
 package org.baeldung.web.controller;
 
+import org.baeldung.service.IFooService;
 import org.baeldung.web.dto.Foo;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,11 +13,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/foo")
-public class FooController {
+@RequestMapping(value = "/foos")
+public class FooController implements InitializingBean {
+
+    @Value("${foo1}")
+    private String foo1;
 
     @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private Environment env;
+
+    @Autowired
+    private IFooService service;
 
     public FooController() {
         super();
@@ -25,7 +34,13 @@ public class FooController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseBody
     public Foo findOne(@PathVariable("id") final Long id) {
-        return new Foo();
+        return service.findOne(id);
+    }
+
+    @Override
+    public final void afterPropertiesSet() {
+        System.out.println("In Child Context, property via @Value = " + foo1);
+        System.out.println("In Child Context, property via env = " + env.getProperty("foo2"));
     }
 
 }

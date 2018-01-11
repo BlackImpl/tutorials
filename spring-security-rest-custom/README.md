@@ -2,7 +2,9 @@
 
 ## Spring Security for REST Example Project
 
+###The Course
+The "REST With Spring" Classes: http://bit.ly/restwithspring
 
 ### Relevant Articles: 
 - [Spring Security Authentication Provider](http://www.baeldung.com/spring-security-authentication-provider)
-- [Unshorten URLs with HttpClient](http://www.baeldung.com/unshorten-url-httpclient)
+- [Retrieve User Information in Spring Security](http://www.baeldung.com/get-user-in-spring-security)

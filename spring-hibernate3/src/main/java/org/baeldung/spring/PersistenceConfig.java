@@ -5,6 +5,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,7 +22,7 @@ import com.google.common.base.Preconditions;
 @Configuration
 @EnableTransactionManagement
 @PropertySource({ "classpath:persistence-mysql.properties" })
-@ComponentScan({ "org.baeldung.spring.persistence.dao", "org.baeldung.spring.persistence.service" })
+@ComponentScan({ "org.baeldung.persistence.dao", "org.baeldung.persistence.service" })
 public class PersistenceConfig {
 
     @Autowired
@@ -53,9 +54,10 @@ public class PersistenceConfig {
     }
 
     @Bean
-    public HibernateTransactionManager transactionManager() {
+    @Autowired
+    public HibernateTransactionManager transactionManager(final SessionFactory sessionFactory) {
         final HibernateTransactionManager txManager = new HibernateTransactionManager();
-        txManager.setSessionFactory(sessionFactory().getObject());
+        txManager.setSessionFactory(sessionFactory);
 
         return txManager;
     }
@@ -66,14 +68,11 @@ public class PersistenceConfig {
     }
 
     final Properties hibernateProperties() {
-        return new Properties() {
-            {
-                setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
-                setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));
-
-                // setProperty("hibernate.globally_quoted_identifiers", "true");
-                // note: necessary in launchpad-storage, but causing problems here
-            }
-        };
+        final Properties hibernateProperties = new Properties();
+        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        hibernateProperties.setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));
+        // hibernateProperties.setProperty("hibernate.globally_quoted_identifiers", "true");
+        return hibernateProperties;
     }
+
 }
